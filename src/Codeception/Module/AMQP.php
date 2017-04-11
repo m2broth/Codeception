@@ -177,6 +177,27 @@ class AMQP extends CodeceptionModule implements RequiresPackage
         $this->createQueue($queue);
         $this->connection->channel()->basic_publish($message, '', $queue);
     }
+    
+    /**
+     * Sends message to queue without create queue
+     *
+     * ``` php
+     * <?php
+     * $I->sendToQueue('queue.jobs', 'create user');
+     * $I->sendToQueue('queue.jobs', new AMQPMessage('create'));
+     * ?>
+     * ```
+     *
+     * @param $queue
+     * @param $message string|AMQPMessage
+     */
+    public function sendToQueue($queue, $message)
+    {
+        $message = $message instanceof AMQPMessage
+            ? $message
+            : new AMQPMessage($message);
+        $this->connection->channel()->basic_publish($message, '', $queue);
+    }
 
     /**
      * Declares an exchange
