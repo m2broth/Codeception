@@ -132,6 +132,30 @@ class AMQP extends CodeceptionModule implements RequiresPackage
     }
 
     /**
+     * Create queue with provided params
+     *
+     * ``` php
+     * <?php
+     * $I->createQueue('exchange.emails', true); //Create passive queue
+     * $I->createQueue('exchange.emails', false, false, true); //Create exclusive queue
+     * ?>
+     * ```
+     * @param $queue
+     * @param bool $passive
+     * @param bool $durable
+     * @param bool $exclusive
+     * @param bool $auto_delete
+     */
+    public function createQueue(
+        $queue,
+        $passive = false,
+        $durable = false,
+        $exclusive = false,
+        $auto_delete = true
+    ) {
+        $this->connection->channel()->queue_declare($queue, $passive, $durable, $exclusive, $auto_delete);
+    }
+    /**
      * Sends message to queue
      *
      * ``` php
@@ -150,7 +174,7 @@ class AMQP extends CodeceptionModule implements RequiresPackage
             ? $message
             : new AMQPMessage($message);
 
-        $this->connection->channel()->queue_declare($queue);
+        $this->createQueue($queue);
         $this->connection->channel()->basic_publish($message, '', $queue);
     }
 
